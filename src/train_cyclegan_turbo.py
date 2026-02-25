@@ -36,6 +36,19 @@ def main(args):
     unet, l_modules_unet_encoder, l_modules_unet_decoder, l_modules_unet_others = initialize_unet(args.lora_rank_unet, return_lora_module_names=True)
     vae_a2b, vae_lora_target_modules = initialize_vae(args.lora_rank_vae, return_lora_module_names=True)
 
+    if args.pretrained_path is not None:
+      print(f"Warm-starting from {args.pretrained_path}")
+
+      sd = torch.load(args.pretrained_path, map_location="cpu")
+
+      # ---- Load existing LoRA weights instead of creating new adapters ----
+      unet.load_state_dict(sd["sd_encoder"], strict=False)
+      unet.load_state_dict(sd["sd_decoder"], strict=False)
+      unet.load_state_dict(sd["sd_other"], strict=False)
+
+      # ---- Load VAE weights ----
+      vae_a2b.load_state_dict(sd["sd_vae_enc"], strict=False)
+
     weight_dtype = torch.float32
     vae_a2b.to(accelerator.device, dtype=weight_dtype)
     text_encoder.to(accelerator.device, dtype=weight_dtype)
