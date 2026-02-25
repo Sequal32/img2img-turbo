@@ -177,6 +177,8 @@ def parse_args_unpaired_training():
         help="Whether or not to use gradient checkpointing to save memory at the expense of slower backward pass.")
     parser.add_argument("--enable_xformers_memory_efficient_attention", action="store_true", help="Whether or not to use xformers.")
 
+    parser.add_argument("--pretrained_path", type=str, default=None, help="Path to pretrained CycleGAN-Turbo checkpoint")
+
     args = parser.parse_args()
     return args
 
